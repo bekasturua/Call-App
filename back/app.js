@@ -3,6 +3,7 @@ dotenv.config();
 
 import Koa from "koa";
 import router from "koa-router";
+import cors from '@koa/cors'
 const app = new Koa();
 
 import { getUsers } from "./services/user.js";
@@ -14,6 +15,8 @@ userRouter.get("/users", async (ctx) => {
   ctx.body = users;
 });
 
-app.use(userRouter.routes());
+app.use(cors());
+app.use(userRouter.routes()).use(userRouter.allowedMethods());;
+
 
 app.listen(3000);
