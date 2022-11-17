@@ -32,6 +32,9 @@ const columns = [
     name: "Phone",
     selector: (user: User) => user.phone,
   },
+  {
+    cell: () => <Button color="danger">Delete</Button>,
+  },
 ];
 
 function App() {
