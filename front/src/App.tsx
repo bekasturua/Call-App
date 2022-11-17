@@ -7,37 +7,41 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 import DataTable from "react-data-table-component";
 
-const columns = [
-  {
-    name: "Name",
-    selector: (user: User) => user.name,
-  },
-  {
-    name: "Email",
-    selector: (user: User) => user.email,
-  },
-  {
-    name: "City",
-    selector: (user: User) => user.address.city,
-  },
-  {
-    name: "Street",
-    selector: (user: User) => user.address.street,
-  },
-  {
-    name: "Gender",
-    selector: (user: User) => user.gender,
-  },
-  {
-    name: "Phone",
-    selector: (user: User) => user.phone,
-  },
-  {
-    cell: () => <Button color="danger">Delete</Button>,
-  },
-];
-
 function App() {
+  const columns = [
+    {
+      name: "Name",
+      selector: (user: User) => user.name,
+    },
+    {
+      name: "Email",
+      selector: (user: User) => user.email,
+    },
+    {
+      name: "City",
+      selector: (user: User) => user.address.city,
+    },
+    {
+      name: "Street",
+      selector: (user: User) => user.address.street,
+    },
+    {
+      name: "Gender",
+      selector: (user: User) => user.gender,
+    },
+    {
+      name: "Phone",
+      selector: (user: User) => user.phone,
+    },
+    {
+      cell: () => (
+        <Button color="danger" onClick={onDeleteHanlder}>
+          Delete
+        </Button>
+      ),
+    },
+  ];
+
   const [modal, setModal] = useState(false);
   const [users, setUsers] = useState<Array<User>>([]);
 
@@ -47,7 +51,7 @@ function App() {
     axios
       .get("http://localhost:3000/users")
       .then((res) => {
-        setUsers(res.data);
+        setUsers(Object.values(res.data));
       })
       .catch((err) => {
         console.log(err);
@@ -61,6 +65,27 @@ function App() {
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState("Male");
 
+  const onAddSubmitHandler = async (event: any) => {
+    event.preventDefault();
+    const user = { name, email, city, street, phone, gender };
+
+    const res = await axios.post(
+      "http://localhost:3000/users",
+      {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        gender: user.gender,
+        address: { city: user.city, street: user.street },
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    console.log(res);
+  };
+
   return (
     <div>
       <div>
@@ -70,7 +95,7 @@ function App() {
         <Modal isOpen={modal} fade={false} toggle={toggle}>
           <ModalHeader toggle={toggle}>Modal title</ModalHeader>
           <ModalBody>
-            <form>
+            <form onSubmit={onAddSubmitHandler}>
               <input
                 type="text"
                 required
