@@ -3,7 +3,6 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { User } from "../types";
 
-import React from "react";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 import DataTable from "react-data-table-component";
@@ -37,10 +36,9 @@ const columns = [
 
 function App() {
   const [modal, setModal] = useState(false);
+  const [users, setUsers] = useState<Array<User>>([]);
 
   const toggle = () => setModal(!modal);
-
-  const [users, setUsers] = useState<Array<User>>([]);
 
   useEffect(() => {
     axios
@@ -53,33 +51,73 @@ function App() {
       });
   }, []);
 
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
+  const [street, setStreet] = useState("");
+  const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("Male");
+
   return (
     <div>
       <div>
-        <Button color="danger" onClick={toggle}>
+        <Button color="success" onClick={toggle}>
           Add User
         </Button>
         <Modal isOpen={modal} fade={false} toggle={toggle}>
           <ModalHeader toggle={toggle}>Modal title</ModalHeader>
           <ModalBody>
-            <input type="text" placeholder="Name..." />
-            <input type="text" placeholder="Email..." />
-            <input type="text" placeholder="City..." />
-            <input type="text" placeholder="Street..." />
-            <input type="text" placeholder="Phone..." />
-            <select>
-              <option value="Male">Male</option>
-              <option value="Famale">Famale</option>
-            </select>
+            <form>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Name..."
+              />
+              <input
+                type="text"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email..."
+              />
+              <input
+                type="text"
+                required
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="City..."
+              />
+              <input
+                type="text"
+                required
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                placeholder="Street..."
+              />
+              <input
+                type="text"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Phone..."
+              />
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+              >
+                <option value="Male">male</option>
+                <option value="Famale">famale</option>
+              </select>
+              <ModalFooter>
+                <Button color="primary" on>
+                  Add
+                </Button>
+                <Button color="secondary">Cancel</Button>
+              </ModalFooter>
+            </form>
           </ModalBody>
-          <ModalFooter>
-            <Button color="primary" onClick={toggle}>
-              Add
-            </Button>
-            <Button color="secondary" onClick={toggle}>
-              Cancel
-            </Button>
-          </ModalFooter>
         </Modal>
       </div>
       <div>
