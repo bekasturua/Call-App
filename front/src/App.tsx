@@ -34,13 +34,19 @@ function App() {
       selector: (user: User) => user.phone,
     },
     {
-      cell: () => (
-        <Button color="danger" onClick={onDeleteHanlder}>
+      cell: (user: User) => (
+        <Button color="danger" onClick={(e) => onDeleteHandler(e, user._id)}>
           Delete
         </Button>
       ),
     },
   ];
+
+  const onDeleteHandler = async (event: any, id: any) => {
+    event.preventDefault();
+
+    const res = await axios.delete("http://localhost:3000/users/" + id);
+  };
 
   const [modal, setModal] = useState(false);
   const [users, setUsers] = useState<Array<User>>([]);

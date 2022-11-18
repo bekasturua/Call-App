@@ -7,9 +7,10 @@ export async function getUsers() {
 }
 
 export async function addUser(user) {
-  const res = await axios.post(process.env.FIREBASE_URL + "users.json", {
-    ...user,
-    id: uuid(),
-  });
+  const res = await axios.post(process.env.FIREBASE_URL + "users.json", user);
   return res.data;
+}
+
+export async function deleteUser(id) {
+  await axios.delete(process.env.FIREBASE_URL + "users/" + id + '.json');
 }
