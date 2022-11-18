@@ -10,6 +10,7 @@ interface UserState {
     setOpts: (opts: Options) => void
     setUsers: (users: User[]) => void
     addUser: (user: User) => void
+    editUser: (user: User) => void
     deleteUser: (userId: string) => void
 }
 
@@ -43,6 +44,7 @@ export const useUserStore = create<UserState>()(
                 setOpts: (opts) => set((state) => ({ opts })),
                 setUsers: (users) => set((state) => ({ users })),
                 addUser: (user) => set((state) => ({ users: [...state.users, user] })),
+                editUser: (user) => set((state) => ({ users: state.users.map(function(u) { return u._id === user._id ? user : u; })})),
                 deleteUser: (userId) => set((state) => ({ users: state.users.filter(user => user._id !== userId) })),
             }),
             {

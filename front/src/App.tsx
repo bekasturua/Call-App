@@ -3,15 +3,30 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { User } from "../types";
 
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import { Button } from "reactstrap";
 
 import DataTable from "react-data-table-component";
 import ReactApexChart from "react-apexcharts";
 import { useUserStore } from "./store";
+import AddUserModal from "./components/AddUserModal";
+import EditUserModal from "./components/EditUserModal";
 
 function App() {
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState("add");
   const state = useUserStore();
+  const [user, setUser] = useState<User>({
+    _id: "",
+    id: null,
+    name: "",
+    phone: "",
+    gender: "",
+    email: "",
+    address: {
+      city: "",
+      street: "",
+    },
+  });
 
   const columns = [
     {
@@ -45,6 +60,13 @@ function App() {
         </Button>
       ),
     },
+    {
+      cell: (user: User) => (
+        <Button color="primary" onClick={() => toggle("edit", user)}>
+          Edit
+        </Button>
+      ),
+    },
   ];
 
   const onDeleteHandler = async (event: any, id: any) => {
@@ -58,7 +80,13 @@ function App() {
 
   const [modal, setModal] = useState(false);
 
-  const toggle = () => setModal(!modal);
+  const toggle = (mode: "add" | "edit", user?: User) => {
+    setModal(!modal);
+    setMode(mode);
+    if (user) {
+      setUser(user);
+    }
+  };
 
   useEffect(() => {
     axios
@@ -78,8 +106,8 @@ function App() {
             cities[user.address.city] = 1;
           }
         }
-        state.setSeries(Object.values(cities))
-        state.setOpts({ ...state.opts, labels: Object.keys(cities) })
+        state.setSeries(Object.values(cities));
+        state.setOpts({ ...state.opts, labels: Object.keys(cities) });
         state.setUsers(users);
       })
       .catch((err) => {
@@ -87,107 +115,36 @@ function App() {
       });
   }, [loading]);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [city, setCity] = useState("");
-  const [street, setStreet] = useState("");
-  const [phone, setPhone] = useState("");
-  const [gender, setGender] = useState("Male");
-
-  const onAddSubmitHandler = async (event: any) => {
-    event.preventDefault();
-    const user = { name, email, city, street, phone, gender };
-
-    const res = await axios.post(
-      "http://localhost:3000/users",
-      {
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        gender: user.gender,
-        address: { city: user.city, street: user.street },
-      },
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    const _id = res.data as string;
-
-    state.addUser({
-      _id,
-      name,
-      email,
-      phone,
-      gender,
-      address: { city, street },
-      id: null,
-    });
-    setLoading(!loading);
-    setModal(false);
-  };
-
   return (
     <div>
       <div>
-        <Button color="success" onClick={toggle}>
+        <Button color="success" onClick={() => toggle("add")}>
           Add User
         </Button>
-        <Modal isOpen={modal} fade={false} toggle={toggle}>
-          <ModalHeader toggle={toggle}>Modal title</ModalHeader>
-          <ModalBody>
-            <form onSubmit={onAddSubmitHandler}>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Name..."
-              />
-              <input
-                type="text"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email..."
-              />
-              <input
-                type="text"
-                required
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="City..."
-              />
-              <input
-                type="text"
-                required
-                value={street}
-                onChange={(e) => setStreet(e.target.value)}
-                placeholder="Street..."
-              />
-              <input
-                type="text"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone..."
-              />
-              <select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-              >
-                <option value="Male">male</option>
-                <option value="Famale">famale</option>
-              </select>
-              <ModalFooter>
-                <Button color="primary" on>
-                  Add
-                </Button>
-                <Button color="secondary">Cancel</Button>
-              </ModalFooter>
-            </form>
-          </ModalBody>
-        </Modal>
+        {mode === "add" ? (
+          <AddUserModal
+            loading={loading}
+            modal={modal}
+            setLoading={setLoading}
+            setModal={setModal}
+            toggle={() => toggle("add")}
+          />
+        ) : (
+          <EditUserModal
+            loading={loading}
+            modal={modal}
+            setLoading={setLoading}
+            setModal={setModal}
+            toggle={() => toggle("edit")}
+            id={user._id}
+            name={user.name}
+            city={user.address.city}
+            email={user.email}
+            gender={user.gender}
+            phone={user.phone}
+            street={user.address.street}
+          />
+        )}
       </div>
       <div>
         <DataTable columns={columns} data={state.users} />
