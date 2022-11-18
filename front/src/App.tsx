@@ -1,13 +1,38 @@
 import "./App.css";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { User } from "../types";
+import { Options, User } from "../types";
 
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 import DataTable from "react-data-table-component";
+import ReactApexChart from "react-apexcharts";
 
 function App() {
+  const [users, setUsers] = useState<Array<User>>([]);
+
+  const [series, setSeries] = useState<Array<Number>>([]);
+  const [opts, setOpts] = useState<Options>({
+    chart: {
+      width: 380,
+      type: "pie",
+    },
+    labels: [],
+    responsive: [
+      {
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200,
+          },
+          legend: {
+            position: "bottom",
+          },
+        },
+      },
+    ],
+  });
+
   const columns = [
     {
       name: "Name",
@@ -49,7 +74,6 @@ function App() {
   };
 
   const [modal, setModal] = useState(false);
-  const [users, setUsers] = useState<Array<User>>([]);
 
   const toggle = () => setModal(!modal);
 
@@ -57,7 +81,23 @@ function App() {
     axios
       .get("http://localhost:3000/users")
       .then((res) => {
-        setUsers(Object.values(res.data));
+        const users: User[] = [];
+        const cities: { [key: string]: number } = {};
+        for (const [key, value] of Object.entries(res.data)) {
+          (value as User)._id = key;
+          const user: User = value as User;
+          users.push(user);
+
+          const cityAmount = cities[user.address.city];
+          if (cityAmount) {
+            cities[user.address.city] = cityAmount + 1;
+          } else {
+            cities[user.address.city] = 1;
+          }
+        }
+        setSeries(Object.values(cities));
+        setOpts({ ...opts, labels: Object.keys(cities) });
+        setUsers(users);
       })
       .catch((err) => {
         console.log(err);
@@ -156,6 +196,13 @@ function App() {
       </div>
       <div>
         <DataTable columns={columns} data={users} />
+        <ReactApexChart
+          options={opts as any}
+          series={series as any}
+          type="pie"
+          width={500}
+          height={320}
+        />
       </div>
     </div>
   );
