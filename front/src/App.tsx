@@ -1,37 +1,17 @@
 import "./App.css";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { Options, User } from "../types";
+import { User } from "../types";
 
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 import DataTable from "react-data-table-component";
 import ReactApexChart from "react-apexcharts";
+import { useUserStore } from "./store";
 
 function App() {
-  const [users, setUsers] = useState<Array<User>>([]);
-
-  const [series, setSeries] = useState<Array<Number>>([]);
-  const [opts, setOpts] = useState<Options>({
-    chart: {
-      width: 380,
-      type: "pie",
-    },
-    labels: [],
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200,
-          },
-          legend: {
-            position: "bottom",
-          },
-        },
-      },
-    ],
-  });
+  const [loading, setLoading] = useState(false);
+  const state = useUserStore();
 
   const columns = [
     {
@@ -71,6 +51,9 @@ function App() {
     event.preventDefault();
 
     const res = await axios.delete("http://localhost:3000/users/" + id);
+
+    state.deleteUser(id);
+    setLoading(!loading);
   };
 
   const [modal, setModal] = useState(false);
@@ -95,14 +78,14 @@ function App() {
             cities[user.address.city] = 1;
           }
         }
-        setSeries(Object.values(cities));
-        setOpts({ ...opts, labels: Object.keys(cities) });
-        setUsers(users);
+        state.setSeries(Object.values(cities))
+        state.setOpts({ ...state.opts, labels: Object.keys(cities) })
+        state.setUsers(users);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [loading]);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -129,7 +112,19 @@ function App() {
       }
     );
 
-    console.log(res);
+    const _id = res.data as string;
+
+    state.addUser({
+      _id,
+      name,
+      email,
+      phone,
+      gender,
+      address: { city, street },
+      id: null,
+    });
+    setLoading(!loading);
+    setModal(false);
   };
 
   return (
@@ -195,10 +190,10 @@ function App() {
         </Modal>
       </div>
       <div>
-        <DataTable columns={columns} data={users} />
+        <DataTable columns={columns} data={state.users} />
         <ReactApexChart
-          options={opts as any}
-          series={series as any}
+          options={state.opts as any}
+          series={state.series as any}
           type="pie"
           width={500}
           height={320}
