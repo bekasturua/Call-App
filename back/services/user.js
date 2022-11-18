@@ -12,5 +12,9 @@ export async function addUser(user) {
 }
 
 export async function deleteUser(id) {
-  await axios.delete(process.env.FIREBASE_URL + "users/" + id + '.json');
+  await axios.delete(process.env.FIREBASE_URL + "users/" + id + ".json");
+}
+
+export async function editUser(id, user) {
+  await axios.put(process.env.FIREBASE_URL + "users/" + id + ".json", user);
 }

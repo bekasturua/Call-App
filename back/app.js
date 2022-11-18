@@ -7,7 +7,7 @@ import cors from "@koa/cors";
 import bodyParser from "koa-bodyparser";
 const app = new Koa();
 
-import { getUsers, addUser, deleteUser } from "./services/user.js";
+import { getUsers, addUser, deleteUser, editUser } from "./services/user.js";
 
 const userRouter = router();
 
@@ -23,6 +23,11 @@ userRouter.post("/users", async (ctx) => {
 
 userRouter.delete("/users/:id", async (ctx) => {
   await deleteUser(ctx.params.id);
+  ctx.body = "success";
+});
+
+userRouter.put("/users/:id", async (ctx) => {
+  await editUser(ctx.params.id, ctx.request.body);
   ctx.body = "success";
 });
 
