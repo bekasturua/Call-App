@@ -1,0 +1,11 @@
+.input input {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+}
+
+.input select {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+}

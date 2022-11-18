@@ -55,44 +55,45 @@ const AddUserModal = (props: AddUserProps) => {
 
   return (
     <Modal isOpen={props.modal} fade={false} toggle={() => props.toggle("add")}>
-      <ModalHeader toggle={() => props.toggle("add")}>Modal title</ModalHeader>
+      <ModalHeader toggle={() => props.toggle("add")}>Add User</ModalHeader>
       <ModalBody>
-        <form onSubmit={onAddSubmitHandler}>
+        <form className="input" onSubmit={onAddSubmitHandler}>
+          <span>Name: </span>
           <input
             type="text"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Name..."
           />
+          <span>Email: </span>
           <input
             type="text"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email..."
           />
+          <span>City: </span>
           <input
             type="text"
             required
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            placeholder="City..."
           />
+          <span>Street: </span>
           <input
             type="text"
             required
             value={street}
             onChange={(e) => setStreet(e.target.value)}
-            placeholder="Street..."
           />
+          <span>Phone: </span>
           <input
             type="text"
             required
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="Phone..."
           />
+          <span>Gender: </span>
           <select value={gender} onChange={(e) => setGender(e.target.value)}>
             <option value="Male">male</option>
             <option value="Famale">famale</option>
